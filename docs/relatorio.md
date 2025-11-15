@@ -20,11 +20,12 @@
     2. [5.2. Protocolo de treinamento e avaliação](#52-protocolo-de-treinamento-e-avaliação)
     3. [5.3. Resultados obtidos](#53-resultados-obtidos)
 6. [6. Resultados e Discussão](#6-resultados-e-discussão)
-   1. [6.1. Comparação global entre os modelos](#61-comparação-global-entre-os-modelos)
-   2. [6.2. Desempenho por classe (`HeartDisease = 0` e `HeartDisease = 1`)](#62-desempenho-por-classe-heartdisease--0-e-heartdisease--1)
-      1. [6.2.1. Classe 0 – pacientes sem doença cardíaca](#621-classe-0--pacientes-sem-doença-cardíaca)
-      2. [6.2.2. Classe 1 – pacientes com doença cardíaca](#622-classe-1--pacientes-com-doença-cardíaca)
-   3. [6.3. Melhor e pior modelo sob a ótica da aplicação](#63-melhor-e-pior-modelo-sob-a-ótica-da-aplicação)
+    1. [6.1. Comparação global entre os modelos](#61-comparação-global-entre-os-modelos)
+    2. [6.2. Desempenho por classe (`HeartDisease = 0` e
+       `HeartDisease = 1`)](#62-desempenho-por-classe-heartdisease--0-e-heartdisease--1)
+        1. [6.2.1. Classe 0 – pacientes sem doença cardíaca](#621-classe-0--pacientes-sem-doença-cardíaca)
+        2. [6.2.2. Classe 1 – pacientes com doença cardíaca](#622-classe-1--pacientes-com-doença-cardíaca)
+    3. [6.3. Melhor e pior modelo sob a ótica da aplicação](#63-melhor-e-pior-modelo-sob-a-ótica-da-aplicação)
 7. [7. Conclusão](#7-conclusão)
 
 ---
@@ -626,5 +627,55 @@ de doença cardíaca.
 
 # 7. Conclusão
 
-- Resumir qual modelo seria indicado para uso prático
-- Limitações (tamanho da amostra, apenas dados tabulares...)
+O objetivo deste trabalho foi utilizar o Heart Failure Prediction Dataset para construir e avaliar modelos de
+classificação supervisionada capazes de prever a presença de doença cardíaca (`HeartDisease`) a partir de 11 atributos
+clínicos simples, rotineiramente coletados em contexto ambulatorial ou de pronto atendimento. Para isso, foram
+realizadas etapas de análise exploratória, pré-processamento dos dados, treinamento de diferentes algoritmos e
+comparação de desempenho com base em métricas padrão de classificação.
+
+A análise exploratória (Seção 3) permitiu caracterizar o conjunto de 918 pacientes em termos de distribuição de idade,
+pressão arterial de repouso, colesterol, frequência cardíaca máxima, presença de glicemia de jejum elevada, tipos de dor
+torácica, padrões de eletrocardiograma e comportamento do segmento ST durante o exercício, além de evidenciar a
+proporção de pacientes com e sem doença cardíaca. Também foi verificado que o dataset não apresenta valores faltantes, o
+que simplificou o pré-processamento.
+
+Na etapa de pré-processamento (Seção 4), as variáveis categóricas foram codificadas por meio de *one-hot encoding*,
+gerando um conjunto de atributos totalmente numéricos. Em seguida, os atributos numéricos foram normalizados para os
+modelos sensíveis à escala, utilizando *standardization*. Os dados foram então divididos em conjuntos de treino e teste
+com estratificação em relação à variável alvo, garantindo a preservação da proporção entre pacientes com e sem doença em
+ambos os conjuntos.
+
+Na modelagem (Seção 5), foram treinados três algoritmos: Regressão Logística, Árvore de Decisão e Random Forest. As
+métricas calculadas no conjunto de teste mostraram que todos os modelos obtiveram desempenho satisfatório, com acurácia
+acima de 0,80, sendo que Random Forest e Regressão Logística se destacaram. Em particular, a Random Forest apresentou a
+maior acurácia e o maior F1 global (cerca de 0,90), enquanto a Regressão Logística obteve desempenho muito próximo, com
+tempo de treinamento significativamente menor.
+
+A discussão dos resultados (Seção 6) indicou que, do ponto de vista global, a **Random Forest** pode ser considerada o
+melhor modelo entre os avaliados, por apresentar o melhor equilíbrio entre precisão e recall nas duas classes. Por outro
+lado, a **Regressão Logística** mostrou-se uma alternativa bastante competitiva, combinando bom desempenho na classe
+positiva (pacientes com doença cardíaca) com menor complexidade e maior interpretabilidade, características desejáveis
+em aplicações clínicas. A **Árvore de Decisão**, embora mais simples e intuitiva, apresentou os piores resultados entre
+os três modelos, sugerindo que, isoladamente, não é a opção mais adequada para este problema.
+
+Apesar dos resultados positivos, o trabalho apresenta algumas limitações. Não foram exploradas estratégias de ajuste
+sistemático de hiperparâmetros (*hyperparameter tuning*), nem comparados outros algoritmos potencialmente relevantes,
+como máquinas de vetores de suporte (SVM) ou k-vizinhos mais próximos (k-NN). Além disso, a análise concentrou-se em
+métricas de desempenho global, sem explorar técnicas de explicabilidade de modelos que poderiam ajudar a entender, de
+forma mais detalhada, a contribuição de cada atributo clínico para a predição de doença cardíaca.
+
+Como trabalhos futuros, sugerem-se:
+
+- Inclusão de novos algoritmos e a aplicação de técnicas de busca de hiperparâmetros (por exemplo, *grid search* ou
+  *random search*);
+- Avaliação de métodos de balanceamento de classes, caso se deseje priorizar ainda mais o desempenho na classe
+  minoritária em outros cenários;
+- Uso de técnicas de explicabilidade (como SHAP ou LIME) para identificar quais variáveis têm maior impacto nas
+  decisões dos modelos;
+- Validação dos modelos em outros conjuntos de dados ou em bases reais de serviços de saúde, a fim de avaliar sua
+  generalização para populações distintas.
+
+De forma geral, os resultados obtidos indicam que é possível, com um conjunto relativamente pequeno de variáveis
+clínicas e modelos de classificação supervisionada bem configurados, alcançar um desempenho relevante na tarefa de
+predição de doença cardíaca, reforçando o potencial da aplicação de técnicas de aprendizado de máquina como ferramenta
+de apoio à decisão em saúde.
