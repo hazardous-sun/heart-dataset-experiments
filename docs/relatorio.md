@@ -11,11 +11,12 @@
     2. [3.2. Gráficos](#32-gráficos)
     3. [3.3. Tabela de valores faltantes](#33-tabela-de-valores-faltantes)
 4. [4. Pré-processamento](#4-pré-processamento)
-   1. [4.1. Verificação de valores faltantes e consistência](#41-verificação-de-valores-faltantes-e-consistência)
-   2. [4.2. Codificação de variáveis categóricas](#42-codificação-de-variáveis-categóricas)
-   3. [4.3. Normalização de atributos numéricos](#43-normalização-de-atributos-numéricos)
-   4. [4.4. Separação em conjuntos de treino e teste](#44-separação-em-conjuntos-de-treino-e-teste)
+    1. [4.1. Verificação de valores faltantes e consistência](#41-verificação-de-valores-faltantes-e-consistência)
+    2. [4.2. Codificação de variáveis categóricas](#42-codificação-de-variáveis-categóricas)
+    3. [4.3. Normalização de atributos numéricos](#43-normalização-de-atributos-numéricos)
+    4. [4.4. Separação em conjuntos de treino e teste](#44-separação-em-conjuntos-de-treino-e-teste)
 5. [5. Modelagem e avaliação](#5-modelagem-e-avaliação)
+    1. [5.1. Modelos de classificação utilizados](#51-modelos-de-classificação-utilizados)
 6. [6. Resultados e Discussão](#6-resultados-e-discussão)
 7. [7. Conclusão](#7-conclusão)
 
@@ -388,11 +389,100 @@ precisão, recall, F1 e tempo de treinamento), conforme detalhado na Seção 5.
 
 # 5. Modelagem e avaliação
 
-- Descrever os 3 algoritmos escolhidos
-- Explicar como foi feita a divisão treino/teste (ou k-fold)
-- Tabelas com:
-    - Acurácia, precisão, recall, F1 e tempo de treino por modelo
-    - (Opcional) ROC curves / matriz de confusão.
+Nesta seção são descritos os modelos de classificação utilizados, o protocolo de avaliação adotado e os resultados
+quantitativos obtidos na tarefa de prever a presença de doença cardíaca (`HeartDisease`) a partir dos atributos clínicos
+do Heart Failure Prediction Dataset.
+
+## 5.1. Modelos de classificação utilizados
+
+Foram selecionados três algoritmos clássicos de classificação supervisionada, com características complementares:
+
+- **Regressão Logística**: Modelo linear amplamente utilizado em problemas de classificação binária. Estima a
+  probabilidade de um exemplo pertencer à classe positiva por meio de uma combinação linear dos atributos, seguida de
+  uma função logística. Neste trabalho, foi utilizada a implementação `LogisticRegression` da biblioteca `scikit-learn`,
+  com `max_iter = 1000` e `random_state = 42`. Como esse modelo é sensível à escala dos atributos, foram utilizados os
+  dados na versão **normalizada** (conjunto `X_train_scaled` / `X_test_scaled`).
+- **Árvore de Decisão**: Modelo baseado em partições recursivas do espaço de atributos, construindo uma estrutura em
+  árvore em que cada nó interno representa uma condição de decisão sobre um atributo, e cada folha representa uma classe
+  prevista. Foi utilizada a implementação `DecisionTreeClassifier` com `random_state = 42`. Como árvores não dependem
+  diretamente da escala dos atributos, este modelo foi treinado com a versão **não normalizada** dos dados (conjunto
+  `X_train` / `X_test`).
+- **Random Forest**: Modelo de *ensemble* baseado em uma coleção de árvores de decisão treinadas sobre subconjuntos
+  amostrais e de atributos, cujas previsões são combinadas, em geral por votação da maioria. A combinação de múltiplas
+  árvores tende a reduzir overfitting e melhorar a capacidade de generalização. Neste trabalho, foi utilizada a
+  implementação `RandomForestClassifier` com `n_estimators = 200` e `random_state = 42`, também sobre a versão **não
+  normalizada** dos dados.
+
+A escolha desses três algoritmos permite comparar um modelo linear (Regressão Logística) com modelos baseados em
+árvores, tanto individual (Árvore de Decisão) quanto em conjunto (Random Forest).
+
+## 5.2. Protocolo de treinamento e avaliação
+
+O conjunto de dados, após o pré-processamento descrito na Seção 4, foi dividido em conjuntos de **treino** e **teste**,
+utilizando a função `train_test_split` da biblioteca `scikit-learn`, com os seguintes parâmetros:
+
+- **Proporção de divisão:** 70% das instâncias para treino e 30% para teste (`test_size = 0.3`);
+- **Estratificação:** a variável alvo `HeartDisease` foi utilizada no parâmetro `stratify`, garantindo que a proporção
+  de pacientes com e sem doença cardíaca fosse aproximadamente mantida tanto no conjunto de treino quanto no de teste;
+- **Semente aleatória:** foi definido `random_state = 42`, de forma a tornar a divisão reprodutível.
+
+Para cada modelo, o processo foi o seguinte:
+
+1. Seleção do conjunto de atributos apropriado:
+    - Modelos sensíveis à escala (Regressão Logística) foram treinados com `X_train_scaled` e avaliados com
+      `X_test_scaled`;
+    - Modelos baseados em árvores (Árvore de Decisão e Random Forest) foram treinados e avaliados com `X_train` e
+      `X_test`.
+2. Medição do **tempo de treinamento**:  
+   Foi utilizada a função `time.time()` antes e depois da chamada ao método `fit` de cada modelo, considerando como
+   tempo de treinamento a diferença entre esses dois instantes, medida em segundos.
+3. Avaliação no conjunto de teste:  
+   Após o treinamento, cada modelo gerou previsões `y_pred` para o conjunto de teste, a partir das quais foram
+   calculadas as seguintes métricas:
+    - **Acurácia** (`accuracy_score`): proporção de instâncias corretamente classificadas;
+    - **Precisão** (`precision_score`): fração de exemplos previstos como classe positiva (`HeartDisease = 1`) que de
+      fato pertencem a essa classe;
+    - **Recall** (`recall_score`): fração de exemplos da classe positiva que foram corretamente identificados como tal;
+    - **F1-score** (`f1_score`): média harmônica entre precisão e recall, resumindo o desempenho na classe positiva em
+      um único valor;
+    - **Tempo de treinamento**, em segundos.
+
+Além dessas métricas globais, foi calculado o `classification_report` de cada modelo, contendo precisão, recall e F1 por
+classe (`0` e `1`). Esses relatórios serão retomados na Seção 6 para discutir o desempenho por classe e comparar o
+melhor e o pior modelo.
+
+## 5.3. Resultados obtidos
+
+A Tabela 6 apresenta o resumo dos resultados quantitativos obtidos pelos três modelos estudados no conjunto de teste,
+considerando a variável alvo `HeartDisease`. Os valores de acurácia, precisão, recall e F1 referem-se à classe
+positiva (`HeartDisease = 1`) e foram calculados com as funções da biblioteca `scikit-learn`.
+
+**Tabela 6 – Desempenho dos modelos de classificação no conjunto de teste**
+
+| Modelo              | Acurácia | Precisão | Recall | F1    | Tempo de treino (s) |
+|---------------------|----------|----------|--------|-------|---------------------|
+| Regressão Logística | 0,884    | 0,876    | 0,922  | 0,898 | 0,005               |
+| Árvore de Decisão   | 0,812    | 0,839    | 0,817  | 0,828 | 0,004               |
+| Random Forest       | 0,895    | 0,897    | 0,915  | 0,906 | 0,272               |
+
+Observa-se que:
+
+- O modelo de **Random Forest** apresentou a **maior acurácia global** (aproximadamente 0,895) e o maior F1-score (≈
+  0,906), indicando bom equilíbrio entre precisão e recall na classe positiva, ao custo de um tempo de treinamento mais
+  elevado (cerca de 0,27 s em comparação com os demais modelos).
+- A **Regressão Logística** obteve desempenho bastante próximo ao da Random Forest, com acurácia em torno de 0,884 e
+  F1 ≈ 0,898. Destaca-se, porém, pelo **maior recall** (≈ 0,922) entre os três modelos, o que significa que,
+  proporcionalmente, identificou um número ligeiramente maior de pacientes com doença cardíaca, ao custo de um pequeno
+  aumento de falsos positivos. Seu tempo de treinamento foi o menor, da ordem de milissegundos.
+- A **Árvore de Decisão** foi o modelo com **desempenho global inferior**, apresentando acurácia de aproximadamente
+  0,812 e F1 ≈ 0,828. Embora ainda apresente resultados razoáveis, mostrou-se menos eficaz que os demais tanto em
+  acurácia quanto em F1, o que é compatível com o fato de ser um modelo único, mais sujeito a overfitting e a variações
+  na partição dos dados.
+
+Na Seção 6, esses resultados serão analisados em maior detalhe, considerando também as métricas por classe (`0` e `1`)
+fornecidas pelos relatórios de classificação de cada modelo, de forma a identificar o melhor e o pior desempenho tanto
+de forma global quanto para cada valor do atributo `HeartDisease`.
+
 
 ---
 
