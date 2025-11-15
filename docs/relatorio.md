@@ -201,30 +201,30 @@ variáveis.
   Esses histogramas ajudam a identificar se as distribuições são mais concentradas em determinadas regiões, se há
   assimetrias marcantes ou presença de possíveis outliers.
 
-|           **Gráfico 1 – Histograma `Age`**            |
-|:-----------------------------------------------------:|
-|         ![Histograma Age](histograma_age.png)         |
-|        **Gráfico 2 – Histograma `RestingBP`**         |
-|   ![Histograma RestingBP](histograma_restingbp.png)   |
-|       **Gráfico 3 – Histograma `Cholesterol`**        |
-| ![Histograma Cholesterol](histograma_cholesterol.png) |
-|          **Gráfico 4 – Histograma `MaxHR`**           |
-|       ![Histograma MaxHR](histograma_maxhr.png)       |
+|               **Gráfico 1 – Histograma `Age`**               |
+|:------------------------------------------------------------:|
+|         ![Histograma Age](assets/histograma_age.png)         |
+|            **Gráfico 2 – Histograma `RestingBP`**            |
+|   ![Histograma RestingBP](assets/histograma_restingbp.png)   |
+|           **Gráfico 3 – Histograma `Cholesterol`**           |
+| ![Histograma Cholesterol](assets/histograma_cholesterol.png) |
+|              **Gráfico 4 – Histograma `MaxHR`**              |
+|       ![Histograma MaxHR](assets/histograma_maxhr.png)       |
 
 - Para as variáveis categóricas `Sex`, `ChestPainType`, `ExerciseAngina` e `ST_Slope` foram gerados **gráficos de
   barras**, em que cada barra corresponde a uma categoria e sua altura representa a contagem de pacientes naquela
   categoria. Esses gráficos permitem visualizar rapidamente qual categoria é dominante em cada atributo, de forma
   complementar às frequências mostradas na Tabela 3.
 
-|               **Gráfico 5 – Gráfico de barras para `Sex`**                |
-|:-------------------------------------------------------------------------:|
-|            ![Gráfico de barras Sex](grafico_de_barras_sex.png)            |
-|          **Gráfico 6 – Gráfico de barras para `ChestPainType`**           |
-|  ![Gráfico de barras ChestPainType](grafico_de_barras_chestpaintype.png)  |
-|          **Gráfico 7 – Gráfico de barras para `ExerciseAngina`**          |
-| ![Gráfico de barras ExerciseAngina](grafico_de_barras_exerciseangina.png) |
-|             **Gráfico 8 – Gráfico de barras para `ST_Slope`**             |
-|       ![Gráfico de barras ST_Slope](grafico_de_barras_st_slope.png)       |
+|                   **Gráfico 5 – Gráfico de barras para `Sex`**                   |
+|:--------------------------------------------------------------------------------:|
+|            ![Gráfico de barras Sex](assets/grafico_de_barras_sex.png)            |
+|              **Gráfico 6 – Gráfico de barras para `ChestPainType`**              |
+|  ![Gráfico de barras ChestPainType](assets/grafico_de_barras_chestpaintype.png)  |
+|             **Gráfico 7 – Gráfico de barras para `ExerciseAngina`**              |
+| ![Gráfico de barras ExerciseAngina](assets/grafico_de_barras_exerciseangina.png) |
+|                **Gráfico 8 – Gráfico de barras para `ST_Slope`**                 |
+|       ![Gráfico de barras ST_Slope](assets/grafico_de_barras_st_slope.png)       |
 
 - Também foi construído um **gráfico de barras** para a variável alvo `HeartDisease`, destacando o número de pacientes
   com e sem doença cardíaca. Esse gráfico torna evidente o grau de balanceamento entre as duas classes e será utilizado
@@ -232,7 +232,7 @@ variáveis.
 
 | **Gráfico 9 – Gráfico de barras para a variável alvo** |
 |:------------------------------------------------------:|
-|        ![img.png](grafico_de_barras_target.png)        |
+|    ![img.png](assets/grafico_de_barras_target.png)     |
 
 Os gráficos produzidos nesta etapa auxiliam na interpretação das tabelas e fornecem uma visão exploratória inicial das
 relações entre as variáveis, ainda que de forma univariada. Relações mais complexas (por exemplo, entre atributos
