@@ -274,11 +274,111 @@ que não foram adotadas estratégias específicas de tratamento de valores ausen
 
 # 4. Pré-processamento
 
-- Normalização / padronização dos atributos numéricos (se usar KNN/SVM)
-- Codificação de categóricos
-    - One-hot encoding para `ChestPainType`, `RestingECG`, `ST_Slope`
-    - Codificação binária simples para `Sex`, `ExerciseAngina`
-- Justificar cada decisão
+Nesta seção são descritas as etapas de pré-processamento aplicadas ao Heart Failure Prediction Dataset antes do
+treinamento dos modelos de classificação. O objetivo é garantir que as variáveis estejam em um formato adequado para os
+algoritmos utilizados, evitando problemas relacionados a tipos de dados, codificação de categorias e escala dos
+atributos numéricos.
+
+Foram realizadas três etapas principais:
+
+1. Verificação de valores faltantes e consistência básica dos dados;
+2. Codificação das variáveis categóricas em formato numérico;
+3. Normalização dos atributos numéricos para os modelos sensíveis à escala.
+
+Ao final, os dados foram divididos em conjuntos de treino e teste.
+
+## 4.1. Verificação de valores faltantes e consistência
+
+Com base na análise exploratória apresentada na Seção 3, foi construída uma tabela de valores faltantes por atributo,
+indicando tanto a quantidade absoluta quanto o percentual de ausências em relação ao total de 918 instâncias. Nessa
+verificação, observou-se que todas as colunas do dataset apresentam **zero valores faltantes**, de modo que não foi
+necessário aplicar técnicas de imputação (como preenchimento por média, mediana ou categoria mais frequente) ou remoção
+de registros incompletos.
+
+Além dos valores faltantes, foi realizada uma inspeção básica dos intervalos dos atributos numéricos (`Age`,
+`RestingBP`, `Cholesterol`, `FastingBS`, `MaxHR` e `Oldpeak`) por meio das estatísticas descritivas e dos histogramas.
+Os valores observados estiveram em faixas plausíveis para um conjunto de dados clínicos, de forma que não foram
+aplicadas transformações específicas para remoção de *outliers*. Para fins deste trabalho, optou-se por **manter todos
+os registros**, documentando apenas as distribuições observadas.
+
+Como o atributo alvo `HeartDisease` já é disponibilizado como variável binária (`0` para ausência e `1` para presença de
+doença cardíaca), não houve necessidade de transformá-lo para outro formato (por exemplo, rótulos nominais), sendo
+utilizado diretamente na etapa de modelagem.
+
+## 4.2. Codificação de variáveis categóricas
+
+O dataset contém tanto variáveis numéricas quanto categóricas. As variáveis categóricas são:
+
+- `Sex`
+- `ChestPainType`
+- `RestingECG`
+- `ExerciseAngina`
+- `ST_Slope`
+
+Como a maior parte dos algoritmos de aprendizado de máquina utilizados neste trabalho espera atributos numéricos como
+entrada, foi necessário converter essas variáveis categóricas para uma representação numérica. Para isso, foi empregada
+a técnica de codificação *one-hot* (*one-hot encoding*), gerando colunas binárias para cada categoria distinta.
+
+A codificação foi realizada utilizando a função `get_dummies` da biblioteca `pandas`, com o parâmetro `drop_first=True`.
+Esse parâmetro faz com que, para cada atributo categórico, uma das categorias seja tomada como referência e não seja
+explicitamente codificada, evitando colinearidade perfeita entre as colunas (o que é desejável sobretudo para modelos
+lineares, como a regressão logística). Em termos práticos:
+
+- Cada atributo categórico original é substituído por um conjunto de colunas indicadoras (0 ou 1).
+- Uma categoria de cada atributo é omitida como base (por exemplo, `Sex_M` passa a ser representado por uma coluna
+  `Sex_M`, enquanto `Sex_F` fica implícito nos casos em que `Sex_M = 0`).
+
+Após essa etapa, obteve-se um novo *dataframe* totalmente numérico, no qual todas as variáveis categóricas foram
+substituídas por suas respectivas colunas one-hot. O atributo alvo `HeartDisease` foi mantido separado, sem sofrer
+transformação.
+
+## 4.3. Normalização de atributos numéricos
+
+Alguns algoritmos de classificação são **sensíveis à escala** dos atributos, como regressão logística, k-vizinhos mais
+próximos (*k-NN*) e máquinas de vetores de suporte (SVM). Para esses modelos, é recomendável que as variáveis numéricas
+tenham escalas comparáveis, evitando que atributos com valores absolutos maiores dominem a função de distância ou a
+função de custo.
+
+Com esse objetivo, foi aplicada uma normalização aos seguintes atributos numéricos:
+
+- `Age`
+- `RestingBP`
+- `Cholesterol`
+- `FastingBS`
+- `MaxHR`
+- `Oldpeak`
+
+A normalização foi realizada utilizando um **escalonamento padrão** (*standardization*), por meio da classe
+`StandardScaler` da biblioteca `scikit-learn`. Esse método transforma cada atributo para ter média aproximada a zero
+e desvio padrão aproximadamente igual a um, com base nas estatísticas calculadas apenas sobre o conjunto de treino. Em
+seguida, o mesmo ajuste é aplicado ao conjunto de teste.
+
+Foram, assim, definidos dois conjuntos de atributos:
+
+- Um conjunto **sem normalização**, adequado principalmente para modelos baseados em árvores (como árvores de decisão e
+  florestas aleatórias), que não dependem da escala dos atributos;
+- Um conjunto **normalizado**, utilizado nos modelos sensíveis à escala (por exemplo, regressão logística e SVM).
+
+Essa abordagem permite comparar o desempenho dos algoritmos sob diferentes estratégias de pré-processamento, conforme
+exigido na avaliação.
+
+## 4.4. Separação em conjuntos de treino e teste
+
+Após a codificação das variáveis categóricas e a preparação das versões normalizada e não normalizada dos atributos
+numéricos, os dados foram divididos em conjuntos de **treino** e **teste**. A separação foi realizada utilizando a
+função `train_test_split` da biblioteca `scikit-learn`.
+
+Foram adotadas as seguintes configurações:
+
+- **Proporção de divisão:** 70% das instâncias para treino e 30% para teste;
+- **Estratificação:** a divisão considerou a variável alvo `HeartDisease` para manter, aproximadamente, a mesma
+  proporção de pacientes com e sem doença cardíaca em ambos os conjuntos;
+- **Semente aleatória:** foi fixado um valor para o parâmetro `random_state`, de forma a garantir a reprodutibilidade
+  dos experimentos.
+
+O conjunto de treino é utilizado para ajustar os parâmetros dos modelos de aprendizado de máquina, enquanto o conjunto
+de teste é reservado exclusivamente para avaliar o desempenho final de cada modelo nas métricas de interesse (acurácia,
+precisão, recall, F1 e tempo de treinamento), conforme detalhado na Seção 5.
 
 ---
 
