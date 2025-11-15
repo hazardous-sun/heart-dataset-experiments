@@ -132,18 +132,143 @@ de variáveis categóricas e normalização de atributos numéricos antes do tre
 
 # 3. Análise exploratória
 
+Nesta seção são apresentadas a caracterização estatística e a distribuição das variáveis do Heart Failure Prediction
+Dataset. O objetivo é descrever o perfil dos pacientes e entender o comportamento dos atributos numéricos e categóricos,
+preparando o terreno para as etapas de pré-processamento e modelagem.
+
 ## 3.1. Tabelas
 
-- `describe()` dos numéricos
-- Frequências das categorias (`value_counts`)
+A Tabela 2 resume as principais estatísticas descritivas dos atributos numéricos do conjunto de dados, incluindo mínimo,
+máximo, média, desvio padrão e quartis. Foram consideradas como variáveis numéricas: `Age`, `RestingBP`, `Cholesterol`,
+`FastingBS`, `MaxHR` e `Oldpeak`. Essas estatísticas permitem ter uma visão geral das faixas de valores observadas, bem
+como da dispersão dos dados em cada atributo.
+
+**Tabela 2 – Estatísticas descritivas dos atributos numéricos do dataset**
+
+| Atributo    | Contagem | Média               | Desvio Padrão      | Mínimo | 1º quartil (25%) | Mediana (50%) | 3º quartil (75%) | Máximo |
+|-------------|----------|---------------------|--------------------|--------|------------------|---------------|------------------|--------|
+| Age         | 918.0    | 53.510893246187365  | 9.43261650673201   | 28.0   | 47.0             | 54.0          | 60.0             | 77.0   |
+| RestingBP   | 918.0    | 132.39651416122004  | 18.5141541199078   | 0.0    | 120.0            | 130.0         | 140.0            | 200.0  |
+| Cholesterol | 918.0    | 198.7995642701525   | 109.38414455220348 | 0.0    | 173.25           | 223.0         | 267.0            | 603.0  |
+| FastingBS   | 918.0    | 0.23311546840958605 | 0.423045624739303  | 0.0    | 0.0              | 0.0           | 0.0              | 1.0    |
+| MaxHR       | 918.0    | 136.80936819172112  | 25.4603341382503   | 60.0   | 120.0            | 138.0         | 156.0            | 202.0  |
+| Oldpeak     | 918.0    | 0.8873638344226579  | 1.0665701510493257 | -2.6   | 0.0              | 0.6           | 1.5              | 6.2    |
+
+Além disso, foi elaborado um resumo das variáveis categóricas (`Sex`, `ChestPainType`, `RestingECG`, `ExerciseAngina` e
+`ST_Slope`), contendo as frequências absolutas e relativas de cada categoria. Esse resumo é apresentado na Tabela 3. A
+partir dessas frequências é possível observar, por exemplo, quais tipos de dor torácica são mais comuns na amostra, qual
+a distribuição por sexo e quais padrões de traçado eletrocardiográfico e de inclinação do segmento ST aparecem com maior
+frequência.
+
+**Tabela 3 – Frequências absolutas e relativas de cada categoria**
+
+| Atributo         | Categoria | Frequência | Percentual |
+|------------------|-----------|------------|------------|
+| `Sex`            | M         | 725        | 78.98      |
+|                  | F         | 193        | 21.02      |
+| `ChestPainType`  | ASY       | 496        | 54.03      |
+|                  | NAP       | 203        | 22.11      |
+|                  | ATA       | 173        | 18.85      |
+|                  | TA        | 46         | 5.01       |
+| `RestingECG`     | Normal    | 552        | 60.13      |
+|                  | LVH       | 188        | 20.48      | 
+|                  | ST        | 178        | 19.39      |
+| `ExerciseAngina` | N         | 547        | 59.59      |
+|                  | Y         | 371        | 40.41      |
+| `ST_Slope`       | Flat      | 460        | 50.11      |
+|                  | Up        | 395        | 43.03      |
+|                  | Down      | 63         | 6.86       |
+
+Por fim, a Tabela 4 apresenta a distribuição da variável alvo `HeartDisease`, mostrando o número de pacientes sem (`0`)
+e com (`1`) doença cardíaca, bem como a proporção de cada classe em relação ao total de 918 instâncias. Essa informação
+é importante para avaliar se o problema de classificação é balanceado ou se há predominância de uma das classes, o que
+pode impactar a escolha de métricas e modelos na etapa de avaliação.
+
+**Tabela 4 – Distribuição da variável alvo**
+
+| Presença de doença cardíaca | Frequência | Percentual |
+|-----------------------------|------------|------------|
+| 0                           | 410        | 44.66      |
+| 1                           | 508        | 55.34      |
 
 ## 3.2. Gráficos
 
-- Histogramas de `Age`, `RestingBP`, `Cholesterol`, `MaxHR`
-- Gráficos de barras de `Sex`, `ChestPainType`, `ExerciseAngina`, `ST_Slope`
-- Distribuição da classe `HeartDisease` (gráfico de barras)
+Para complementar as tabelas, foram gerados gráficos que permitem visualizar de forma mais intuitiva a distribuição das
+variáveis.
+
+- Para os atributos numéricos `Age`, `RestingBP`, `Cholesterol` e `MaxHR` foram construídos **histogramas**, nos quais o
+  eixo horizontal representa faixas de valores e o eixo vertical representa a frequência de pacientes em cada faixa.
+  Esses histogramas ajudam a identificar se as distribuições são mais concentradas em determinadas regiões, se há
+  assimetrias marcantes ou presença de possíveis outliers.
+
+|           **Gráfico 1 – Histograma `Age`**            |
+|:-----------------------------------------------------:|
+|         ![Histograma Age](histograma_age.png)         |
+|        **Gráfico 2 – Histograma `RestingBP`**         |
+|   ![Histograma RestingBP](histograma_restingbp.png)   |
+|       **Gráfico 3 – Histograma `Cholesterol`**        |
+| ![Histograma Cholesterol](histograma_cholesterol.png) |
+|          **Gráfico 4 – Histograma `MaxHR`**           |
+|       ![Histograma MaxHR](histograma_maxhr.png)       |
+
+- Para as variáveis categóricas `Sex`, `ChestPainType`, `ExerciseAngina` e `ST_Slope` foram gerados **gráficos de
+  barras**, em que cada barra corresponde a uma categoria e sua altura representa a contagem de pacientes naquela
+  categoria. Esses gráficos permitem visualizar rapidamente qual categoria é dominante em cada atributo, de forma
+  complementar às frequências mostradas na Tabela 3.
+
+|               **Gráfico 5 – Gráfico de barras para `Sex`**                |
+|:-------------------------------------------------------------------------:|
+|            ![Gráfico de barras Sex](grafico_de_barras_sex.png)            |
+|          **Gráfico 6 – Gráfico de barras para `ChestPainType`**           |
+|  ![Gráfico de barras ChestPainType](grafico_de_barras_chestpaintype.png)  |
+|          **Gráfico 7 – Gráfico de barras para `ExerciseAngina`**          |
+| ![Gráfico de barras ExerciseAngina](grafico_de_barras_exerciseangina.png) |
+|             **Gráfico 8 – Gráfico de barras para `ST_Slope`**             |
+|       ![Gráfico de barras ST_Slope](grafico_de_barras_st_slope.png)       |
+
+- Também foi construído um **gráfico de barras** para a variável alvo `HeartDisease`, destacando o número de pacientes
+  com e sem doença cardíaca. Esse gráfico torna evidente o grau de balanceamento entre as duas classes e será utilizado
+  como referência nas discussões sobre desempenho dos modelos de classificação na Seção 6.
+
+| **Gráfico 9 – Gráfico de barras para a variável alvo** |
+|:------------------------------------------------------:|
+|        ![img.png](grafico_de_barras_target.png)        |
+
+Os gráficos produzidos nesta etapa auxiliam na interpretação das tabelas e fornecem uma visão exploratória inicial das
+relações entre as variáveis, ainda que de forma univariada. Relações mais complexas (por exemplo, entre atributos
+clínicos e a presença de doença) serão retomadas na discussão dos resultados dos modelos.
 
 ## 3.3. Tabela de valores faltantes
+
+Como parte da análise exploratória, foi construída uma tabela específica para verificar a presença de **valores
+faltantes** em cada atributo do dataset. A Tabela 5 apresenta, para cada coluna, o número absoluto de valores ausentes e
+a porcentagem correspondente em relação ao total de 918 instâncias.
+
+**Tabela 5 – Tabela de valores faltantes**
+
+| Atributo       | Faltantes | Percentual |
+|----------------|-----------|------------|
+| Age            | 0         | 0.0        |
+| Sex            | 0         | 0.0        |
+| ChestPainType  | 0         | 0.0        |
+| RestingBP      | 0         | 0.0        |
+| Cholesterol    | 0         | 0.0        |
+| FastingBS      | 0         | 0.0        |
+| RestingECG     | 0         | 0.0        |
+| MaxHR          | 0         | 0.0        |
+| ExerciseAngina | 0         | 0.0        |
+| Oldpeak        | 0         | 0.0        |
+| ST_Slope       | 0         | 0.0        |
+| HeartDisease   | 0         | 0.0        |
+
+A partir dessa análise, verificou-se que o arquivo disponibilizado não contém valores faltantes nas variáveis
+consideradas, ou seja, todas as colunas apresentam 0 valores ausentes. Isso simplifica o pré-processamento, pois não há
+necessidade de aplicar técnicas de imputação de dados (como preenchimento por média, mediana ou categoria mais
+frequente) ou de exclusão de registros por falta de informação.
+
+Ainda assim, a construção dessa tabela é importante para documentar de forma explícita a qualidade dos dados utilizados
+e justificar as decisões tomadas nas etapas seguintes. Na Seção 4, parte desse diagnóstico é retomado para explicar por
+que não foram adotadas estratégias específicas de tratamento de valores ausentes.
 
 ---
 
