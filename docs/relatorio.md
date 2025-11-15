@@ -17,7 +17,14 @@
     4. [4.4. Separação em conjuntos de treino e teste](#44-separação-em-conjuntos-de-treino-e-teste)
 5. [5. Modelagem e avaliação](#5-modelagem-e-avaliação)
     1. [5.1. Modelos de classificação utilizados](#51-modelos-de-classificação-utilizados)
+    2. [5.2. Protocolo de treinamento e avaliação](#52-protocolo-de-treinamento-e-avaliação)
+    3. [5.3. Resultados obtidos](#53-resultados-obtidos)
 6. [6. Resultados e Discussão](#6-resultados-e-discussão)
+   1. [6.1. Comparação global entre os modelos](#61-comparação-global-entre-os-modelos)
+   2. [6.2. Desempenho por classe (`HeartDisease = 0` e `HeartDisease = 1`)](#62-desempenho-por-classe-heartdisease--0-e-heartdisease--1)
+      1. [6.2.1. Classe 0 – pacientes sem doença cardíaca](#621-classe-0--pacientes-sem-doença-cardíaca)
+      2. [6.2.2. Classe 1 – pacientes com doença cardíaca](#622-classe-1--pacientes-com-doença-cardíaca)
+   3. [6.3. Melhor e pior modelo sob a ótica da aplicação](#63-melhor-e-pior-modelo-sob-a-ótica-da-aplicação)
 7. [7. Conclusão](#7-conclusão)
 
 ---
@@ -488,8 +495,132 @@ de forma global quanto para cada valor do atributo `HeartDisease`.
 
 # 6. Resultados e Discussão
 
-- Apontar melhor e pior modelo
-- Discutir performance por classe (usando `classification_report`)
+Nesta seção são discutidos os resultados obtidos pelos três modelos de classificação considerados — Regressão Logística,
+Árvore de Decisão e Random Forest — tanto do ponto de vista global (acurácia e F1) quanto em termos de desempenho por
+classe (`HeartDisease = 0` e `HeartDisease = 1`), com base nos relatórios de classificação gerados na Seção 5.
+
+## 6.1. Comparação global entre os modelos
+
+A Tabela 6 ([Seção 5.3](#53-resultados-obtidos)) mostrou que os três modelos obtiveram resultados razoáveis no problema
+de predição de doença cardíaca, com acurácia variando aproximadamente entre 0,81 e 0,89. De forma geral:
+
+- **Random Forest** apresentou o **melhor desempenho global**, com:
+    - Acurácia ≈ **0,895**
+    - Precisão ≈ **0,897**
+    - Recall ≈ **0,915**
+    - F1 ≈ **0,906**
+- **Regressão Logística** ficou próxima, com:
+    - Acurácia ≈ **0,884**
+    - Precisão ≈ **0,876**
+    - Recall ≈ **0,922**
+    - F1 ≈ **0,898**
+- **Árvore de Decisão** apresentou o **pior desempenho entre os três**, com:
+    - Acurácia ≈ **0,812**
+    - Precisão ≈ **0,839**
+    - Recall ≈ **0,817**
+    - F1 ≈ **0,828**
+
+Em termos práticos, isso significa que todos os modelos conseguem diferenciar pacientes com e sem doença cardíaca com
+desempenho razoável, mas o modelo de Random Forest se destaca por combinar boa precisão e bom recall de forma
+equilibrada, resultando no maior F1-score. A Regressão Logística, apesar de ligeiramente inferior em acurácia e F1,
+apresenta um desempenho muito próximo ao da Random Forest, com a vantagem de ter tempo de treinamento bem menor.
+
+A Árvore de Decisão, por sua vez, é o modelo mais simples e interpretável, mas também o mais sujeito a overfitting e à
+variação em função da partição dos dados, o que se reflete na acurácia e F1 inferiores em relação aos outros dois.
+
+## 6.2. Desempenho por classe (`HeartDisease = 0` e `HeartDisease = 1`)
+
+Para analisar com mais detalhes o comportamento dos modelos, é útil olhar para as métricas **por classe** nos relatórios
+de classificação.
+
+### 6.2.1. Classe 0 – pacientes sem doença cardíaca
+
+Os resultados para a classe `0` (sem doença cardíaca) foram:
+
+- **Regressão Logística**
+    - Precisão: **0,90**
+    - Recall: **0,84**
+    - F1: **0,87**
+    - Suporte: 123 exemplos
+
+- **Árvore de Decisão**
+    - Precisão: **0,78**
+    - Recall: **0,80**
+    - F1: **0,79**
+
+- **Random Forest**
+    - Precisão: **0,89**
+    - Recall: **0,87**
+    - F1: **0,88**
+
+A Random Forest apresentou o **melhor equilíbrio** entre precisão e recall para a classe 0, com F1 ≈ 0,88. A Regressão
+Logística teve precisão ligeiramente maior (0,90), porém com recall menor (0,84), ou seja, é um pouco mais conservadora:
+quando indica que um paciente não tem doença, tende a acertar, mas deixa passar um pouco mais de casos dessa classe. A
+Árvore de Decisão foi claramente a pior entre as três, com F1 ≈ 0,79, indicando desempenho inferior na identificação
+correta de pacientes sem doença cardíaca.
+
+### 6.2.2. Classe 1 – pacientes com doença cardíaca
+
+Para a classe `1` (com doença cardíaca), os resultados foram:
+
+- **Regressão Logística**
+    - Precisão: **0,88**
+    - Recall: **0,92**
+    - F1: **0,90**
+    - Suporte: 153 exemplos
+
+- **Árvore de Decisão**
+    - Precisão: **0,84**
+    - Recall: **0,82**
+    - F1: **0,83**
+
+- **Random Forest**
+    - Precisão: **0,90**
+    - Recall: **0,92**
+    - F1: **0,91**
+
+Aqui, tanto a **Random Forest** quanto a **Regressão Logística** se destacam, com **recall ≈ 0,92** em ambos os casos.
+Ou seja, aproximadamente 92% dos pacientes com doença cardíaca presentes no conjunto de teste foram corretamente
+identificados como classe 1 por esses dois modelos. A Random Forest leva ligeira vantagem em F1 (≈ 0,91 vs. ≈ 0,90),
+devido a uma precisão um pouco maior (0,90 contra 0,88).
+
+Do ponto de vista clínico, um recall alto na classe positiva é desejável, pois significa que o modelo consegue
+identificar a maior parte dos pacientes com doença cardíaca, reduzindo o número de **falsos negativos** (casos de doença
+não detectados pelo modelo). Nesse aspecto, Random Forest e Regressão Logística se mostram adequadas, enquanto a Árvore
+de Decisão, com F1 ≈ 0,83, apresenta desempenho sensivelmente inferior.
+
+## 6.3. Melhor e pior modelo sob a ótica da aplicação
+
+Considerando o contexto do problema — predição de doença cardíaca — e as métricas analisadas, é possível sintetizar os
+resultados da seguinte forma:
+
+- **Melhor modelo (globalmente): Random Forest**  
+  A Random Forest apresentou a maior acurácia e o maior F1 global, além de manter bom desempenho em ambas as classes.
+  Para a classe 1 (pacientes com doença), combinou recall elevado com boa precisão, o que a torna um candidato sólido
+  para aplicações em que se deseja maximizar a detecção de casos positivos sem aumentar excessivamente os falsos
+  positivos.
+
+- **Modelo com melhor custo-benefício: Regressão Logística**  
+  A Regressão Logística ficou muito próxima da Random Forest em termos de acurácia e F1, com recall ligeiramente
+  superior na classe positiva e tempo de treinamento bem menor. Além disso, é um modelo mais simples e interpretável, o
+  que pode ser uma vantagem em contextos clínicos em que se deseja justificar decisões com base em pesos e coeficientes
+  associados às variáveis.
+
+- **Pior modelo (entre os três): Árvore de Decisão**  
+  Embora obtenha desempenho aceitável, a Árvore de Decisão apresenta acurácia e F1 substancialmente menores em
+  comparação aos outros dois modelos, tanto na classe 0 quanto na classe 1. Isso sugere que, para este dataset em
+  particular, uma única árvore não é suficiente para capturar adequadamente os padrões dos dados, sendo superada pelos
+  modelos linear (Regressão Logística) e de ensemble (Random Forest).
+
+Em resumo, os resultados indicam que modelos relativamente simples, como a Regressão Logística, já são capazes de obter
+desempenho competitivo na predição de doença cardíaca a partir dos 11 atributos clínicos do *Heart Failure Prediction
+Dataset*. A Random Forest melhora um pouco esses resultados ao custo de maior complexidade e tempo de treinamento,
+enquanto a Árvore de Decisão isolada se mostra menos adequada como modelo final para este problema.
+
+Trabalhos futuros poderiam incluir a comparação com outros algoritmos (como SVM ou k-vizinhos mais próximos), ajustes
+sistemáticos de hiperparâmetros (*hyperparameter tuning*) e a utilização de técnicas de explicabilidade de modelos, de
+forma a investigar mais detalhadamente quais atributos contribuem de maneira mais relevante para a predição da presença
+de doença cardíaca.
 
 ---
 
